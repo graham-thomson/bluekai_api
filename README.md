@@ -50,3 +50,10 @@ pprint(resp[1])
  u'vertical': {u'name': u'My DMP'},
  u'visibilityStatus': u'notHidden'}
 ```
+
+#### Installation
+```bash
+git clone https://github.com/graham-thomson/bluekai_api.git
+cd bluekai_api
+python setup.py install
+```
