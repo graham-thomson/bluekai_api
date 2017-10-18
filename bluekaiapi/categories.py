@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json
 import requests
 import hmac
@@ -5,13 +6,13 @@ import urllib
 import hashlib
 import base64
 
+
 class Categories(object):
 
     def __init__(self, user_key, private_key):
         self.user_key = user_key
         self.private_key = private_key
-        self.site_id = 40138
-        self.protocol = "http"
+        self.protocol = "https"
         self.endpoint = "taxonomy.bluekai.com/taxonomy/categories"
 
     def create_signature(self, string):
@@ -67,7 +68,6 @@ class Categories(object):
         except ValueError:
             return request.status_code, request.content
 
-
     def read_category(self, id):
         """
         Retrieve information for a specific category (for example, reach, price)
@@ -77,7 +77,7 @@ class Categories(object):
 
         http_method = "GET"
         uri_path = "/taxonomy/categories/"
-        query_arg_values = id
+        query_arg_values = str(id)
 
         bk_sig = self.create_signature(
             http_method + uri_path + query_arg_values
@@ -93,7 +93,7 @@ class Categories(object):
         request = requests.get("{p}://{e}/{id}?{q}".format(
             p=self.protocol,
             e=self.endpoint,
-            id=id,
+            id=str(id),
             q=payload_str
         ))
 
@@ -124,7 +124,6 @@ class Categories(object):
         http_method = "POST"
         uri_path = "/taxonomy/categories"
         body = json.dumps(body) if isinstance(body, dict) else body
-
         bk_sig = self.create_signature(
             http_method + uri_path + body
         )
@@ -132,6 +131,9 @@ class Categories(object):
         request_params = {
             "bkuid": self.user_key
         }
+
+        headers = {"Accept": "application/json", "Content-type": "application/json",
+                   "User_Agent": "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.1) Gecko/20090624 Firefox/3.5"}
 
         payload_str = "&".join("{k}={v}".format(k=k, v=v) for k, v in request_params.items())
         payload_str += "&" + urllib.urlencode({"bksig": bk_sig})
@@ -141,14 +143,8 @@ class Categories(object):
             e=self.endpoint,
             q=payload_str
         ),
-        # data=json.loads(body),
-        json=body
-        )
-
-        # bksig=t821GTAZXyKFQVVb8V0tETHG1uP72iHGYloYJvTzqf0%3D
-
-
-        print request.url
+        headers=headers,
+        data=body)
 
         try:
             return request.status_code, request.json()
@@ -179,3 +175,6 @@ class Categories(object):
         http_method = "PUT"
         url_path = "/taxonomy/categories"
         body = json.dumps(body) if isinstance(body, dict) else body
+
+        # TODO implement the rest of this method.
+        pass
